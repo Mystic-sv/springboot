@@ -1,0 +1,26 @@
+pipeline {
+  agent any
+  tools {
+    maven 'maven-3.9.2'
+  }
+  stages {
+    stage ('Build') {
+      steps {
+        bat 'mvn clean -Dmaven.test.skip package'
+      }
+    }
+    stage ('Deploy') {
+      steps {
+        script {
+         deploy adapters: [tomcat10.1.18(credentialsId: 'tomcatId', path:'', url: 'http://192.168.3.117:8080')], contextPath:'', onFailure: false, war:'**/target/bootdemowithjsp-0.0.1-SNAPSHOT.war' 
+        }
+      }
+    }
+  }
+  post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
+http://192.168.3.117:8090/github-webhook/
